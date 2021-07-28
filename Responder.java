@@ -1,5 +1,6 @@
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -7,7 +8,7 @@ import java.util.HashSet;
  * The responder class represents a response generator object. It is used to
  * generate an automatic response to an input string.
  *
- * @author Michael Kölling and David J. Barnes
+ * @author Michael KÃ¶lling and David J. Barnes
  * @author ruthWenzel & n-c0de-r
  * @version 1.0_awesome! (2016.02.29 updated 21.12.20)
  */
@@ -63,7 +64,7 @@ public class Responder {
 	 */
 	private void fillAlternativeMap() {
 		alternativeMap.put("why", "You tell me, you started the conversation.");
-		alternativeMap.put("where", "We are located in Berlin, Schöneweide.");
+		alternativeMap.put("where", "We are located in Berlin, SchÃ¶neweide.");
 		alternativeMap.put("how", "It's best to hit it a few times! ... Softly first! Else hard");
 		alternativeMap.put("who", "Someone else might be able to help you. Not us.");
 		alternativeMap.put("when", "We are not working during Christmas.");
@@ -78,8 +79,8 @@ public class Responder {
 	 *         list of responses depending on it's size of contained elements.
 	 *         Including 0 but excluding the size number!
 	 */
-	public String generateResponse() {
-		int index = -1; //
+	public String generateRandomResponse() {
+		int index = 0; //
 		while (index == lastAnswer) { // compares the two variables
 			index = rng.nextInt(responses.size()); // generates a new random int
 		} // unless new index is the same as the one in the answer before, continue
@@ -93,38 +94,21 @@ public class Responder {
 	 * @param input takes an input String from SupportSystem.
 	 */
 	public String generateResponse(String input) {
-		//Split the input string into words, thus creating an array of words
-		//and store the words in it's own Array set called wordArray.
-		String[] wordArray = input.split("\\W");
+		// Generation according to the book
+		HashSet<String> words = new HashSet<>(Arrays.asList(input.trim().split("\\W")));
 		
-		//Put the words from an Array in a set of words, removing duplicates.
-		/*
-		 * We found out, that this can be disregarded. The function is the same in this
-		 * case and we could save one (slightly confusing) for-loop.
-		 */
-		HashSet<String> words = new HashSet<>();
-		for (String word : wordArray) {
-			words.add(word);
-		}
-		/*
-		 * You could also write a shorthand version of the code above, according to to
-		 * the lecture book page 196. HashSet<String> words = new
-		 * HashSet<>(Arrays.asList(input.trim().split(" ")));
-		 */
+		 // generate a random response in case nothing final is found
+		String response = generateRandomResponse();
+		
 		//See if any word are found.
 		for (String word : words) {
-			String response = responseMap.get(word);
-			if (response != null) {
-				return response;
+			if (responseMap.get(word) != null) {
+				response = responseMap.get(word);
+			}else if (alternativeMap.get(word) != null) {
+				response = alternativeMap.get(word);
 			}
-		} // nothing found in responseMap
-		//looks for alternative words
-		for (String word : words) {
-			String response = alternativeMap.get(word);
-			if (response != null) {
-				return response;
-			}
-		} // nothing found in alternativeMap
-		return generateResponse(); // generate a random response
+		}
+		
+		return response;
 	}
 }
